@@ -8,82 +8,95 @@
 </head>
 
 <body>
-    <div class="center scramble-page" id="00002.webp">
-        <div id="page_1" data-page="1" style="height: 0px;opacity:0 ">2
-            / 39</div>
-        <img src="./00002.webp?v=1701491053"
-            data-original="https://cdn-msp2.18comic.vip/media/photos/421536/00002.webp?v=1701491053"
-            id="album_photo_00002.webp" class="lazy_img img-responsive-mw" style="" data-page="1">
+<div class="center scramble-page" id="00002.webp">
+    <div id="page_1" data-page="1" style="height: 0px;opacity:0 ">2
+        / 39
     </div>
+    <img src="./00002.webp?v=1701491053"
+         data-original="https://cdn-msp2.18comic.vip/media/photos/421536/00002.webp?v=1701491053"
+         id="album_photo_00002.webp" class="lazy_img img-responsive-mw" style="" data-page="1">
+</div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
 <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
 <script>
     onImageLoaded(document.getElementById("album_photo_00002.webp"));
-    function onImageLoaded(e) {
-        aid = 421536;
-        var t;
-        t = document.createElement("canvas");
-        e.after(t)
-        var a = t.getContext("2d")
-            , n = e.width
-            , d = e.naturalWidth
-            , i = e.naturalHeight;
-        t.width = d,
-            t.height = i,
-            n = e.width,
-            t.style.width = n + "px",
-            t.style.display = "block";
-        var o = document.getElementById(e.id).parentNode;
-        o = (o = o.id.split("."))[0]; // 图片id
-        for (var s = get_num(window.btoa(aid), window.btoa(o)), l = parseInt(i % s), r = d, m = 0; m < s; m++) {
-            var c = Math.floor(i / s)
-                , g = c * m
-                , w = i - c * (m + 1) - l;
-            0 == m ? c += l : g += l,
-                a.drawImage(e, 0, w, r, c, 0, g, r, c)
+
+    function onImageLoaded(imgElement) {
+        let aid = 421536; // 漫画id
+        let canvas = document.createElement("canvas"); // 创建一个canvas画布，绘画解析后的图片
+
+        imgElement.after(canvas) // 在img标签后显示canvas画布
+
+        let canvasContext = canvas.getContext("2d") // 获取canvas 2d上下文对象
+        let imgNaturalWidth = imgElement.naturalWidth // 获取图片原始宽
+        let imgNaturalHeight = imgElement.naturalHeight; // 获取图片原始高
+
+        canvas.width = imgNaturalWidth // 设置canvas绘图宽
+        canvas.height = imgNaturalHeight // 设置canvas绘图高
+
+        canvas.style.width = imgElement.width + "px" // 设置canvas显示时的宽度，高度会等比例缩放？
+        canvas.style.display = "block" // 设置为块元素
+
+        var o = document.getElementById(imgElement.id).parentNode; // 图片父节点
+        index = o.id.split(".")[0]; // 获取图片在一组中的index 当前为00002
+        let cutNum = get_num(aid.toString(), index.toString()) // 获取分割次数
+        let _unknown = parseInt(imgNaturalHeight % cutNum) // 偏移高度 最后一张图的高度会比其他图高度要高
+
+        for (m = 0; m < cutNum; m++) {
+            var cutHeight = Math.floor(imgNaturalHeight / cutNum) // 分割的高度
+            let yCoordinate = cutHeight * m // 要分割的y坐标
+            let endCoordinate = imgNaturalHeight - cutHeight * (m + 1) - _unknown // 要分割的图片底部y
+            0 === m ? cutHeight += _unknown : yCoordinate += _unknown
+            // 如果循环次数为0 分割高度 + 偏移高度 否则 y坐标 + 偏移高度
+            console.log(`第${m}次：` + endCoordinate, imgNaturalWidth, cutHeight, 0, yCoordinate, imgNaturalWidth, cutHeight)
+            canvasContext.drawImage(imgElement, 0, endCoordinate, imgNaturalWidth, cutHeight, 0, yCoordinate, imgNaturalWidth, cutHeight)
+            // drawImage(源图像,x坐标,y坐标,源图像宽度,源图像高度,Canvas x坐标,Canvas y坐标,Canvas 绘制宽度,Canvas 绘制高度)
         }
-        $(e).css("display", "none");
+        $(imgElement).css("display", "none");
     }
 
-    function get_num(e, t) {
-        var a = 10
-            , n = (e = window.atob(e)) + (t = window.atob(t));
-        switch (n = (n = (n = CryptoJS.MD5(n).toString()).substr(-1)).charCodeAt(),
-        e >= window.atob("MjY4ODUw") && e <= window.atob("NDIxOTI1") ? n %= 10 : e >= window.atob("NDIxOTI2") && (n %= 8),
-        n) {
+    function get_num(aid, index) {
+        let normalCutNum = 10 // 默认切割数
+        let aIndex = aid + index // aid和index
+        aIndex = CryptoJS.MD5(aIndex).toString().substr(-1).charCodeAt() // md5编码后 取最后一位 获取所在unicode码表位置
+        aid >= 268850 && aid <= 421925 ? aIndex %= 10 : aid >= 421926 && (aIndex %= 8)
+        // 如果 aid 大于等于 268850 且小于等于 421925，则将 aIndex 更新为除以 10 的余数 (aIndex %= 10)
+        // 如果上述条件不成立，且 aid 大于等于 421926，则将 aIndex 更新为除以 8 的余数 (aIndex %= 8)
+        // 如果都不匹配则使用unicode码表位置作判断
+        switch (aIndex) {
             case 0:
-                a = 2;
+                normalCutNum = 2;
                 break;
             case 1:
-                a = 4;
+                normalCutNum = 4;
                 break;
             case 2:
-                a = 6;
+                normalCutNum = 6;
                 break;
             case 3:
-                a = 8;
+                normalCutNum = 8;
                 break;
             case 4:
-                a = 10;
+                normalCutNum = 10;
                 break;
             case 5:
-                a = 12;
+                normalCutNum = 12;
                 break;
             case 6:
-                a = 14;
+                normalCutNum = 14;
                 break;
             case 7:
-                a = 16;
+                normalCutNum = 16;
                 break;
             case 8:
-                a = 18;
+                normalCutNum = 18;
                 break;
             case 9:
-                a = 20
+                normalCutNum = 20
         }
-        return a
+        return normalCutNum
     }
 
 </script>
